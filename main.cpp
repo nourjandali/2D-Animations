@@ -29,6 +29,7 @@ bool isOctagon = false;
 bool isRotating = false;
 bool isScaling = false;
 bool isTranslating = false;
+bool isFull = false;
 
 // Terminate window function
 void processInput(GLFWwindow* window)
@@ -48,6 +49,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isSquare = true;
 		isHexagon = false;
 		isOctagon = false;
+		isFull = false; // redraw object after clearing screen
 		color = glm::vec4(1, 0.388, 0.278, 1.0f);
 	}
 
@@ -60,6 +62,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isSquare = false;
 		isHexagon = true;
 		isOctagon = false;
+		isFull = false; // redraw object after clearing screen
 		color = glm::vec4(1, 0.965, 0.561, 1.0f);
 	}
 
@@ -72,6 +75,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isSquare = false;
 		isHexagon = false;
 		isOctagon = true;
+		isFull = false; // redraw object after clearing screen
 		color = glm::vec4(0.753, 0.839, 0.894, 1.0f);
 	}
 
@@ -94,6 +98,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isRotating = false;
 		isScaling = false;
 		isTranslating = true;
+	}
+
+	else if (key == GLFW_KEY_O && action == GLFW_PRESS)
+	{
+		isFull = true;
 	}
 }
 
@@ -348,16 +357,25 @@ int main(void)
 		unsigned int colorLoc = glGetUniformLocation(programID, "color");
 		glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 
+		// Clear screen
+		if (isFull)
+		{
+			indices = 0;
+		}
+
 		// Bind VAO
-		if (isSquare) {
+		if (isSquare)
+		{
 			glBindVertexArray(vao1);
 		}
 
-		if (isHexagon) {
+		if (isHexagon)
+		{
 			glBindVertexArray(vao2);
 		}
 
-		if (isOctagon) {
+		if (isOctagon)
+		{
 			glBindVertexArray(vao3);
 		}
 

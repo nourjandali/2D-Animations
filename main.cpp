@@ -23,6 +23,8 @@ const int width = 1024, height = 1024;
 glm::mat4 trans(1.0f);
 glm::vec4 color;
 int indices = 0;
+float xPos = 0.0f;
+float yPos = 0.0f;
 bool isSquare = false;
 bool isHexagon = false;
 bool isOctagon = false;
@@ -38,6 +40,14 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 }
 
+float randomPositions()
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(-0.95, 0.95);
+	return dis(gen);
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
@@ -51,6 +61,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isOctagon = false;
 		isFull = false; // redraw object after clearing screen
 		color = glm::vec4(1, 0.388, 0.278, 1.0f);
+		xPos = randomPositions();
+		yPos = randomPositions();
 	}
 
 	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
@@ -64,6 +76,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isOctagon = false;
 		isFull = false; // redraw object after clearing screen
 		color = glm::vec4(1, 0.965, 0.561, 1.0f);
+		xPos = randomPositions();
+		yPos = randomPositions();
 	}
 
 	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
@@ -77,6 +91,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isOctagon = true;
 		isFull = false; // redraw object after clearing screen
 		color = glm::vec4(0.753, 0.839, 0.894, 1.0f);
+		xPos = randomPositions();
+		yPos = randomPositions();
 	}
 
 	else if (key == GLFW_KEY_R && action == GLFW_PRESS)
@@ -272,6 +288,7 @@ int main(void)
 	// Local variables declaration
 	float translTime = 0.0f;
 	float scaleSize = 0.0f;
+	float rotationAngle = 0.0f;
 	bool translateDirection = false; // right -> true, left -> false
 	bool scaleDirection = false; // bigger -> true, smaller -> false
 
@@ -293,9 +310,12 @@ int main(void)
 		// Use our shader
 		glUseProgram(programID);
 
+		trans = glm::translate(glm::mat4(1.0f), glm::vec3(xPos, yPos, 0.0));
+
 		if (isRotating)
 		{
-			trans = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 100, glm::vec3(0.0, 0.0, 1.0));
+			trans = glm::translate(glm::mat4(1.0f), glm::vec3(xPos, yPos, 0.0)) * glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0, 0.0, 1.0));
+			rotationAngle += 0.1f;
 		}
 
 		if (isScaling)
@@ -305,7 +325,8 @@ int main(void)
 
 		if (isTranslating)
 		{
-			trans = glm::translate(glm::mat4(1.0f), glm::vec3(translTime, 0.0, 0.0));
+			trans = glm::translate(glm::mat4(1.0f), glm::vec3(translTime, yPos, 0.0)) * glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0, 0.0, 1.0));
+			xPos = translTime;
 		}
 
 		// Translating over time
@@ -398,4 +419,4 @@ int main(void)
 	glfwTerminate();
 
 	return 0;
-}
+};

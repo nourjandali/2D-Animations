@@ -20,9 +20,12 @@
 // Global variables
 GLFWwindow* window;
 const int width = 1024, height = 1024;
-int verticesCount = 0;
 glm::mat4 trans(1.0f);
 glm::vec4 color;
+int indices = 0;
+bool isSquare = false;
+bool isHexagon = false;
+bool isOctagon = false;
 bool isRotating = false;
 bool isScaling = false;
 bool isTranslating = false;
@@ -38,9 +41,38 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
-		if (verticesCount != 6)
-			verticesCount = 6;
+		if (indices != 6)
+		{
+			indices = 6;
+		}
+		isSquare = true;
+		isHexagon = false;
+		isOctagon = false;
 		color = glm::vec4(1, 0.388, 0.278, 1.0f);
+	}
+
+	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+	{
+		if (indices != 18)
+		{
+			indices = 18;
+		}
+		isSquare = false;
+		isHexagon = true;
+		isOctagon = false;
+		color = glm::vec4(1, 0.965, 0.561, 1.0f);
+	}
+
+	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
+	{
+		if (indices != 24)
+		{
+			indices = 24;
+		}
+		isSquare = false;
+		isHexagon = false;
+		isOctagon = true;
+		color = glm::vec4(0.753, 0.839, 0.894, 1.0f);
 	}
 
 	else if (key == GLFW_KEY_R && action == GLFW_PRESS)
@@ -104,7 +136,10 @@ int main(void)
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
 
-	GLfloat vertices[] =
+	GLuint vao1, vao2, vao3, vbo1, vbo2, vbo3, ibo1, ibo2, ibo3;
+
+	/* ------------------------------ Square ------------------------------ */
+	GLfloat squareVertices[] =
 	{
 		0.05f,  0.05f, 0.0f,  // top right
 		0.05f, -0.05f, 0.0f,  // bottom right
@@ -112,31 +147,111 @@ int main(void)
 		-0.05f,  0.05f, 0.0f  // top left 
 	};
 
-	GLuint indices[] =
+	GLuint squareIndices[] =
 	{
 		0, 3, 1,  // first triangle
 		1, 3, 2,  // second triangle
 	};
 
-
-	GLuint vao, vbo, ibo;
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ibo);
+	glGenVertexArrays(1, &vao1);
+	glGenBuffers(1, &vbo1);
+	glGenBuffers(1, &ibo1);
 
 	// Bind VAO
-	glBindVertexArray(vao);
+	glBindVertexArray(vao1);
 
 	// Bind VBO
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo1);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
 
 	// Bind IBO
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo1);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(squareIndices), squareIndices, GL_STATIC_DRAW);
 
-	// Wireframe mode
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// Set attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	/* ------------------------------ Hexagon ------------------------------ */
+	GLfloat hexagonVertices[] =
+	{
+		0.0, 0.0, 0.0, // 0
+		0.025, 0.05, 0.0, // 1
+		0.05, 0.0, 0.0, // 2
+		0.025, -0.05, 0.0, // 3
+		-0.025, -0.05, 0.0, // 4
+		-0.05, 0.0, 0.0, // 5
+		-0.025, 0.05, 0.0, // 6
+	};
+
+	GLuint hexagonIndices[] =
+	{
+		0, 1, 2,
+		0, 2, 3,
+		0, 3, 4,
+		0, 4, 5,
+		0, 5, 6,
+		0, 6, 1,
+	};
+
+	glGenVertexArrays(1, &vao2);
+	glGenBuffers(1, &vbo2);
+	glGenBuffers(1, &ibo2);
+
+	// Bind VAO
+	glBindVertexArray(vao2);
+
+	// Bind VBO
+	glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(hexagonVertices), hexagonVertices, GL_STATIC_DRAW);
+
+	// Bind IBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo2);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(hexagonIndices), hexagonIndices, GL_STATIC_DRAW);
+
+	// Set attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	/* ------------------------------ Octagon ------------------------------ */
+	GLfloat octagonVertices[] =
+	{
+		0.0, 0.0, 0.0, // 0
+		0.025, 0.05, 0.0, // 1
+		0.05, 0.025, 0.0, // 2
+		0.05, -0.025, 0.0, // 3
+		0.025, -0.05, 0.0, // 4
+		-0.025, -0.05, 0.0, // 5
+		-0.05, -0.025, 0.0, // 6
+		-0.05, 0.025, 0.0, // 7
+		-0.025, 0.05, 0.0, // 8
+	};
+
+	GLuint octagonIndices[] =
+	{
+		0, 1, 2,
+		0, 2, 3,
+		0, 3, 4,
+		0, 4, 5,
+		0, 5, 6,
+		0, 6, 7,
+		0, 7, 8,
+		0, 8, 1,
+	};
+	glGenVertexArrays(1, &vao3);
+	glGenBuffers(1, &vbo3);
+	glGenBuffers(1, &ibo3);
+
+	// Bind VAO
+	glBindVertexArray(vao3);
+
+	// Bind VBO
+	glBindBuffer(GL_ARRAY_BUFFER, vbo3);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(octagonVertices), octagonVertices, GL_STATIC_DRAW);
+
+	// Bind IBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo3);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(octagonIndices), octagonIndices, GL_STATIC_DRAW);
 
 	// Set attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -145,11 +260,11 @@ int main(void)
 	// Set call back
 	glfwSetKeyCallback(window, key_callback);
 
+	// Local variables declaration
 	float translTime = 0.0f;
 	float scaleSize = 0.0f;
 	bool translateDirection = false; // right -> true, left -> false
 	bool scaleDirection = false; // bigger -> true, smaller -> false
-
 
 	// Check if the window was closed
 	while (!glfwWindowShouldClose(window))
@@ -169,9 +284,6 @@ int main(void)
 		// Use our shader
 		glUseProgram(programID);
 
-		// Bind VAO
-		glBindVertexArray(vao);
-
 		if (isRotating)
 		{
 			trans = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 100, glm::vec3(0.0, 0.0, 1.0));
@@ -185,7 +297,6 @@ int main(void)
 		if (isTranslating)
 		{
 			trans = glm::translate(glm::mat4(1.0f), glm::vec3(translTime, 0.0, 0.0));
-			//std::cout << translTime << "\n";
 		}
 
 		// Translating over time
@@ -237,14 +348,32 @@ int main(void)
 		unsigned int colorLoc = glGetUniformLocation(programID, "color");
 		glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 
+		// Bind VAO
+		if (isSquare) {
+			glBindVertexArray(vao1);
+		}
+
+		if (isHexagon) {
+			glBindVertexArray(vao2);
+		}
+
+		if (isOctagon) {
+			glBindVertexArray(vao3);
+		}
+
 		// Draw our object
-		glDrawElements(GL_TRIANGLES, verticesCount, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
 	}
 
 	// Cleanup
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ibo);
-	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo1);
+	glDeleteBuffers(1, &ibo1);
+	glDeleteVertexArrays(1, &vao1);
+
+	glDeleteBuffers(1, &vbo3);
+	glDeleteBuffers(1, &ibo3);
+	glDeleteVertexArrays(1, &vao3);
+
 	glDeleteProgram(programID);
 
 	// Close OpenGL window and terminate GLFW

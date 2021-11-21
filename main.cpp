@@ -31,7 +31,7 @@ bool isOctagon = false;
 bool isRotating = false;
 bool isScaling = false;
 bool isTranslating = false;
-bool isFull = false;
+bool initClear = false;
 
 // Terminate window function
 void processInput(GLFWwindow* window)
@@ -40,6 +40,7 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 }
 
+// Generate random positions
 float randomPositions()
 {
 	std::random_device rd;
@@ -59,7 +60,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isSquare = true;
 		isHexagon = false;
 		isOctagon = false;
-		isFull = false; // redraw object after clearing screen
+		initClear = false; // redraw object after clearing screen
 		color = glm::vec4(1, 0.388, 0.278, 1.0f);
 		xPos = randomPositions();
 		yPos = randomPositions();
@@ -74,7 +75,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isSquare = false;
 		isHexagon = true;
 		isOctagon = false;
-		isFull = false; // redraw object after clearing screen
+		initClear = false; // redraw object after clearing screen
 		color = glm::vec4(1, 0.965, 0.561, 1.0f);
 		xPos = randomPositions();
 		yPos = randomPositions();
@@ -89,7 +90,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		isSquare = false;
 		isHexagon = false;
 		isOctagon = true;
-		isFull = false; // redraw object after clearing screen
+		initClear = false; // redraw object after clearing screen
 		color = glm::vec4(0.753, 0.839, 0.894, 1.0f);
 		xPos = randomPositions();
 		yPos = randomPositions();
@@ -118,7 +119,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	else if (key == GLFW_KEY_O && action == GLFW_PRESS)
 	{
-		isFull = true;
+		initClear = true;
 	}
 }
 
@@ -314,7 +315,8 @@ int main(void)
 
 		if (isRotating)
 		{
-			trans = glm::translate(glm::mat4(1.0f), glm::vec3(xPos, yPos, 0.0)) * glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0, 0.0, 1.0));
+			trans = glm::translate(glm::mat4(1.0f), glm::vec3(xPos, yPos, 0.0))
+				* glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0, 0.0, 1.0));
 			rotationAngle += 0.1f;
 		}
 
@@ -325,23 +327,23 @@ int main(void)
 
 		if (isTranslating)
 		{
-			trans = glm::translate(glm::mat4(1.0f), glm::vec3(translTime, yPos, 0.0)) * glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0, 0.0, 1.0));
+			trans = glm::translate(glm::mat4(1.0f), glm::vec3(translTime, yPos, 0.0))
+				* glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0, 0.0, 1.0));
 			xPos = translTime;
 		}
 
-		// Translating over time
+		// When hitting window, change the direction
 		if (translTime > 0.95f)
 		{
 			translTime = 0.95f;
 			translateDirection = true;
-
 		}
-		else if (translTime < -0.95f)
-		{
+		else if (translTime < -0.95f) {
 			translTime = -0.95f;
 			translateDirection = false;
 		}
 
+		// Translating in a specific direction
 		if (translateDirection)
 		{
 			translTime -= 0.001f;
@@ -350,18 +352,18 @@ int main(void)
 			translTime += 0.001f;
 		}
 
-		// Scaling over time
+		// When hitting window, change scale direction
 		if (scaleSize > 20.0f)
 		{
 			scaleSize = 20.0f;
 			scaleDirection = true;
 		}
-		else if (scaleSize < 0.1f)
-		{
+		else if (scaleSize < 0.1f) {
 			scaleSize = 0.1f;
 			scaleDirection = false;
 		}
 
+		// Scaling bigger or smaller
 		if (scaleDirection)
 		{
 			scaleSize -= 0.01f;
@@ -379,7 +381,7 @@ int main(void)
 		glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 
 		// Clear screen
-		if (isFull)
+		if (initClear)
 		{
 			indices = 0;
 		}
@@ -408,6 +410,10 @@ int main(void)
 	glDeleteBuffers(1, &vbo1);
 	glDeleteBuffers(1, &ibo1);
 	glDeleteVertexArrays(1, &vao1);
+
+	glDeleteBuffers(1, &vbo2);
+	glDeleteBuffers(1, &ibo2);
+	glDeleteVertexArrays(1, &vao2);
 
 	glDeleteBuffers(1, &vbo3);
 	glDeleteBuffers(1, &ibo3);

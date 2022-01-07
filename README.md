@@ -1,3 +1,5 @@
+<strong>2D Simple Animations by using C++ OpenGL (including glfw libraries).</strong>
+
 When the user presses specific keyboard keys, one of the following objects will be drawn at random points in space (visible on the screen). Only one object should be visible at a time.
  
   *	Square

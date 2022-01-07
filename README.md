@@ -19,10 +19,10 @@ When the user presses specific keyboard keys (“S”), <strong>scalation</stron
 
 ![Alt Text](https://media.giphy.com/media/5HxUtCnAPm8FrojDuB/giphy.gif)
 
-When we press a different transformation key, the current one should stop (e.g. If we press T and then S, we won’t get a continuous translation + scaling at the same time)
+When the user presses a different transformation key, the current one should stop (e.g. If we press T and then S, we won’t get a continuous translation + scaling at the same time)
 
 ![Alt Text](https://media.giphy.com/media/XFvDLatGnScYK4VUOO/giphy.gif)
 
-Pressing key “O” will completely clear the screen displaying only the background
+When the user presses "O" will completely clear the screen displaying only the background
 
 ![Alt Text](https://media.giphy.com/media/rNFtX91A8uXmaITRUc/giphy.gif)
